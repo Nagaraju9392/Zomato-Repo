@@ -1,5 +1,5 @@
 # Use Node.js 16 slim as the base image
-FROM node:16-slim
+FROM node:16-slim AS deploy
 
 # Set the working directory
 WORKDIR /app
@@ -8,13 +8,18 @@ WORKDIR /app
 COPY package*.json ./
 
 # Install dependencies
-RUN npm install
+RUN npm install  -- production
 
 # Copy the rest of the application code
 COPY . .
 
 # Build the React app
-RUN npm run build
+RUN npm run build 
+FROM deploy AS final 
+COPY . .
+
+# Build the React app
+RUN npm run build 
 
 # Expose port 3000 (or the port your app is configured to listen on)
 EXPOSE 3000
